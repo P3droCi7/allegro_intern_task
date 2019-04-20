@@ -1,26 +1,23 @@
 package pl.skrzypczak.allegro_intern_task;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-
-import java.time.LocalDateTime;
+import java.util.Date;
 
 public class AllegroRepoObject {
-  private String id;
+  private Number id;
   private String name;
-  private String date;
+  private Date updateDatetime;
 
-  public AllegroRepoObject(String id, String name, String date) {
+  public AllegroRepoObject(Number id, String name, Date updateDatetime) {
     this.id = id;
     this.name = name;
-    this.date = date;
+    this.updateDatetime = updateDatetime;
   }
 
-  public String getId() {
+  public Number getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Number id) {
     this.id = id;
   }
 
@@ -32,12 +29,12 @@ public class AllegroRepoObject {
     this.name = name;
   }
 
-  public String getDate() {
-    return date;
+  public Date getUpdateDatetime() {
+    return updateDatetime;
   }
 
-  public void setDate(String date) {
-    this.date = date;
+  public void setUpdateDatetime(Date updateDatetime) {
+    this.updateDatetime = updateDatetime;
   }
 
   @Override
@@ -45,7 +42,7 @@ public class AllegroRepoObject {
     return "AllegroRepoObject{" +
             "id=" + id +
             ", name='" + name + '\'' +
-            ", date=" + date +
+            ", updateDatetime=" + updateDatetime +
             '}';
   }
 }

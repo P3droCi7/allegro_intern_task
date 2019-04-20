@@ -2,7 +2,6 @@ package pl.skrzypczak.allegro_intern_task;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
@@ -11,9 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.stream.Stream;
 
 @RestController
 public class AllegroRepoRest {
@@ -46,17 +47,19 @@ public class AllegroRepoRest {
           String jsonString = writer.toString();
 
           JsonParser parser = new JsonParser();
-
           JsonElement jsonTree = parser.parse(jsonString);
 
           for (int i = 0; i < jsonTree.getAsJsonArray().size(); i++) {
 
+            String jsonName = jsonTree.getAsJsonArray().get(i).getAsJsonObject().get("name").toString();
+            String jsonNameSubstring = jsonName.substring(1,jsonName.length()-1);
+            Number jsonId = jsonTree.getAsJsonArray().get(i).getAsJsonObject().get("id").getAsNumber();
 
-            String f1 = String.valueOf((JsonPrimitive) jsonTree.getAsJsonArray().get(i).getAsJsonObject().get("name"));
-            String f2 = String.valueOf(jsonTree.getAsJsonArray().get(i).getAsJsonObject().get("id"));
-            String f3 = String.valueOf((JsonPrimitive) jsonTree.getAsJsonArray().get(i).getAsJsonObject().get("updated_at"));
 
-            AllegroRepoObject instanceOfAnObject = new AllegroRepoObject(f2, f1, f3);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("\"yyyy-MM-dd'T'hh:mm:ss'Z'\"");
+            Date jsonUpdatedAt = simpleDateFormat.parse(String.valueOf(jsonTree.getAsJsonArray().get(i).getAsJsonObject().get("updated_at")));
+
+            AllegroRepoObject instanceOfAnObject = new AllegroRepoObject(jsonId, jsonNameSubstring, jsonUpdatedAt);
             AllegroRepos.add(instanceOfAnObject);
 
           }
@@ -65,6 +68,8 @@ public class AllegroRepoRest {
     } catch (
             IOException e) {
       e.printStackTrace();
+    } catch (ParseException e) {
+      e.printStackTrace();
     } finally {
       method.releaseConnection();
     }
@@ -72,11 +77,11 @@ public class AllegroRepoRest {
   }
 
   @GetMapping("/AllegroRepos/lastlyUpdated")
-  public AllegroRepoObject grabLastlyUpdatedAllegroRepo() {
+  public List grabLastlyUpdatedAllegroRepo() {
 
     HttpClient client = new HttpClient();
     HttpMethod method = new GetMethod("https://api.github.com/orgs/allegro/repos?type=all&sort=updated&per_page=100");
-    AllegroRepoObject allegroRepoObject = null;
+    List AllegroRepos = new ArrayList();
 
     try {
       client.executeMethod(method);
@@ -99,25 +104,33 @@ public class AllegroRepoRest {
           String jsonString = writer.toString();
 
           JsonParser parser = new JsonParser();
-
           JsonElement jsonTree = parser.parse(jsonString);
 
+          for (int i = 0; i < 1; i++) {
 
-          String f1 = String.valueOf((JsonPrimitive) jsonTree.getAsJsonArray().get(0).getAsJsonObject().get("name"));
-          String f2 = String.valueOf((JsonPrimitive) jsonTree.getAsJsonArray().get(0).getAsJsonObject().get("id"));
-          String f3 = String.valueOf((JsonPrimitive) jsonTree.getAsJsonArray().get(0).getAsJsonObject().get("updated_at"));
+            String jsonName = jsonTree.getAsJsonArray().get(i).getAsJsonObject().get("name").toString();
+            String jsonNameSubstring = jsonName.substring(1,jsonName.length()-1);
+            Number jsonId = jsonTree.getAsJsonArray().get(i).getAsJsonObject().get("id").getAsNumber();
 
-          allegroRepoObject = new AllegroRepoObject(f2, f1, f3);
 
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("\"yyyy-MM-dd'T'hh:mm:ss'Z'\"");
+            Date jsonUpdatedAt = simpleDateFormat.parse(String.valueOf(jsonTree.getAsJsonArray().get(i).getAsJsonObject().get("updated_at")));
+
+            AllegroRepoObject instanceOfAnObject = new AllegroRepoObject(jsonId, jsonNameSubstring, jsonUpdatedAt);
+            AllegroRepos.add(instanceOfAnObject);
+
+          }
         }
       }
     } catch (
             IOException e) {
       e.printStackTrace();
+    } catch (ParseException e) {
+      e.printStackTrace();
     } finally {
       method.releaseConnection();
     }
-    return allegroRepoObject;
+    return AllegroRepos;
   }
 
 }
