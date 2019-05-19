@@ -1,0 +1,1 @@
+Project created in connection with allegro intern task. Application retrives lastly updated repository from public Allegro repository on github, as an API Json format.
